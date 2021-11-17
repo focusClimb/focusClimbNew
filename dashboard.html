@@ -1,45 +1,70 @@
+<!DOCTYPE HTML>
 <html>
-    <head>
-            <title>
-                    FocusClimb
-            </title>
-            <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-            <meta content="utf-8" http-equiv="encoding">
-            <link rel="stylesheet" type="text/css" href="style.css">
-            <style>
-                body {
-                        background-size: cover;
-                        background-repeat: no-repeat;
-                        background-color: #4a4d52;
-                }
-            </style>
-    </head>
-    <body>
-            <div id="menu-bar" style="position: fixed; width: 250px; transition: all 300ms ease 0s; height: 100%; top: 0px; right: -250px;" class="">
-              <div class="handle"><<<span class="glyphicon glyphicon-chevron-left"></span></div>
-              <h3>
-                FocusClimb.com<br>
-                <small><span class="glyphicon glyphicon-info-sign"></span> Press <kbd>ESC</kbd> to close</small>
-              </h3>
-              <div class="flex-container">
-                <div>
-                        Background Search Term:
-                </div>
-                <div><input id="focusClimbSearchTerm" type="text" value="sunrise"></div>
-                <div><input id="changebackground" type="button" value="Change Background"></div>
-                <div><input id="previous" type="button" value="Previous Background"></div>
-                <div><input id="next" type="button" value="Next Background"></div>
-                <div><input id="clock" type="button" value="Toggle the Clock"></div>
-                <div>pexels.com Token:</div>
-                <div><input id="focusClimbPexelsToken" type="text" placeholder="Please get a token"></div>
-                </div>
-            </div>
 
-            <div id="digital-clock">00:00:00</div>
-            <div id="message"></div>
+<head>
+  <meta charset="utf-8" />
+  <title>FocusClimb</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet"
+        href="style.css" />
+</head>
 
-            <script src="jquery-3.6.0.min.js" ></script>
-            <script src="jquery.slidereveal.min.js"></script>
-            <script src="focusclimb.js" ></script>
-    </body>
+<body>
+  <div id="menu-bar"
+       style="position: fixed; width: 250px; transition: all 300ms ease 0s; height: 100%; top: 0px; right: -250px;"
+       class="">
+    <div class="handle">
+      <<<span class="glyphicon glyphicon-chevron-left"></span>
+    </div>
+    <h3>
+      FocusClimb.com<br>
+      <small><span class="glyphicon glyphicon-info-sign"></span> Press <kbd>ESC</kbd> to close</small>
+    </h3>
+    <div class="flex-container">
+      <div>
+        Background Search Term:
+      </div>
+      <div>
+        <input id="focusClimbSearchTerm"
+               type="text"
+               value="sunrise">
+      </div>
+      <div>
+        <input id="changebackground"
+               type="button"
+               value="Change Background">
+      </div>
+      <div>
+        <input id="previous"
+               type="button"
+               value="Previous Background">
+      </div>
+      <div>
+        <input id="next"
+               type="button"
+               value="Next Background">
+      </div>
+      <div>
+        <input id="clock"
+               type="button"
+               value="Toggle the Clock">
+      </div>
+      <div>pexels.com Token:</div>
+      <div>
+        <input id="focusClimbPexelsToken"
+               type="text"
+               placeholder="Please get a token">
+      </div>
+    </div>
+  </div>
+
+  <div id="digital-clock">00:00:00</div>
+  <div id="message"></div>
+
+  <script src="jquery-3.6.0.min.js"></script>
+  <script src="jquery.slidereveal.min.js"></script>
+  <script src="focusclimb.js"></script>
+</body>
+
 </html>
