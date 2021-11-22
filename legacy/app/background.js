@@ -1,26 +1,38 @@
-// https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/onBeforeRequest
-// match pattern for the URLs to redirect
-var pattern = ["https://twitter.com/*", "https://www.twitter.com/*"];
-pattern.push("https://www.youtube.com/*");
-console.log(pattern);
+/* global readStorage */
+/* global getResourceUrl */
+/* global removeOnBeforeRequestListener */
+/* global addOnBeforeRequestListener */
+/* global addOnStorageChangedListener */
 
-// redirect function
-// returns an object with a property `redirectURL`
-// set to the new URL
-function redirect(requestDetails) {
-  console.log("Redirecting: " + requestDetails.url);
-  return {
-    redirectUrl: "https://38.media.tumblr.com/tumblr_ldbj01lZiP1qe0eclo1_500.gif"
-  };
+async function getConfig() {
+	const config = await readStorage();
+	return config ? config : {
+		enabled: true,
+		blockedHosts: []
+	};
 }
 
-// add the listener,
-// passing the filter argument and "blocking"
-browser.webRequest.onBeforeRequest.addListener(
-    redirect,
-  {urls:pattern},
-  ["blocking"]
-);
+function block(request) {
+	const url = getResourceUrl('blocked.html') + '#url=' + encodeURIComponent(request.url);
+	return {
+		redirectUrl: url
+	};
+}
 
+async function reloadBlocker() {
+	removeOnBeforeRequestListener(block);
 
-  
+	const config = await getConfig();
+	if (config.enabled) {
+		const urls = [];
+		for (let i = 0; i < config.blockedHosts.length; i++) {
+			urls.push('*://' + config.blockedHosts[i] + '/*');
+		}
+		if (urls.length > 0) {
+			addOnBeforeRequestListener(block, urls);
+		}
+	}
+}
+
+reloadBlocker();
+addOnStorageChangedListener(reloadBlocker);
