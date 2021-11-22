@@ -1,0 +1,49 @@
+{
+   "chrome_url_overrides": {
+      "newtab": "dashboard.html"
+   },
+   "manifest_version" : 2,
+   "content_security_policy": "script-src 'self'; object-src 'self'",
+   "description": "Don’t struggle to focus, enjoy it! Replace new tab page with a personal dashboard featuring , desired pictures and inspiration.",
+   "name": "Focus Climb",
+   "offline_enabled": true,
+   "short_name": "FocusClimb",
+   "version": "0.2.0",
+   "icons": {
+		"32": "icons/icon-32.png",
+		"48": "icons/icon-48.png",
+		"64": "icons/icon-64.png",
+		"96": "icons/icon-96.png",
+		"128": "icons/icon-128.png"
+	},
+	"browser_action": {
+		"default_title": "FocusClimb",
+		"default_popup": "popup.html",
+		"default_icon": {
+			"32": "icons/icon-32.png",
+			"48": "icons/icon-48.png",
+			"64": "icons/icon-64.png",
+			"96": "icons/icon-96.png",
+			"128": "icons/icon-128.png"
+		}
+	},
+	"background": {
+		"scripts": [
+			"api.js",
+			"background.js"
+		]
+	},
+	"web_accessible_resources": [
+		"blocked.html",
+		"blocked.css",
+		"blocked.js",
+		"api.js"
+	],
+	"permissions": [
+		"tabs",
+		"storage",
+		"webRequest",
+		"webRequestBlocking",
+		"<all_urls>"
+	]
+}

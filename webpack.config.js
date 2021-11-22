@@ -61,9 +61,9 @@ const config = {
       patterns: [
         { from: 'src/assets', to: 'assets', noErrorOnMissing: true },
         { from: 'legacy/app', to: 'legacy/firefox', noErrorOnMissing: true },
-        { from: 'legacy/manifests/firefox.manifest.json', to: 'legacy/firefox/manifest.json', noErrorOnMissing: true },
+        { from: 'legacy/firefox', to: 'legacy/firefox', noErrorOnMissing: true },
         { from: 'legacy/app', to: 'legacy/chrome', noErrorOnMissing: true },
-        { from: 'legacy/manifests/chrome.manifest.json', to: 'legacy/chrome/manifest.json', noErrorOnMissing: true },
+        { from: 'legacy/chrome', to: 'legacy/chrome', noErrorOnMissing: true },
       ],
     }),
   ],
