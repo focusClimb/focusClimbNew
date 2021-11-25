@@ -44,7 +44,16 @@ const config = {
           },
           "css-loader",
           "sass-loader",
-          'postcss-loader',
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  ["postcss-preset-env", "autoprefixer"],
+                ],
+              },
+            },
+          },
         ],
       },
       {
