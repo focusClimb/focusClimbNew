@@ -4,6 +4,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const config = {
   mode: 'production',
@@ -54,9 +55,12 @@ const config = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.json', '.css', '.scss'],
+    plugins: [
+      new TsconfigPathsPlugin({})
+    ]
   },
   output: {
-    filename: 'bundle.[hash].js',
+    filename: 'bundle.[chunkhash].js',
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
