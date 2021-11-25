@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
@@ -18,6 +20,11 @@ const config = {
         test: /\.tsx?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
+      },
+      {
+        test: /\.html$/,
+        exclude: /node_modules/,
+        use: { loader: 'html-loader' }
       },
       {
         test: /\.s[ac]ss$/i,
@@ -46,7 +53,7 @@ const config = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
+    extensions: ['.tsx', '.ts', '.js', '.json', '.css', '.scss'],
   },
   output: {
     filename: 'bundle.[hash].js',
