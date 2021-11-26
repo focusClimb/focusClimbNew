@@ -21,6 +21,7 @@
       "@app/*": ["./src/app/*"],
       "@components/*": ["./src/app/components/*"],
       "@decorators/*": ["./src/app/decorators/*"],
+      "@helpers/*": ["./src/app/helpers/*"],
       "@icons/*": ["./src/icons/*"]
     },
     "rootDir": "./src",
