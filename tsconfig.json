@@ -26,6 +26,7 @@
       "@icons/*": ["./src/app/icons/*"],
       "@models/*": ["./src/app/models/*"],
       "@reactive/*": ["./src/app/reactive/*"],
+      "@services/*": ["./src/app/services/*"],
     },
     "rootDir": "./src",
     "skipLibCheck": true,
