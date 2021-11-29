@@ -17,7 +17,7 @@ export class SvgIcons {
     }
   }
 
-  loadIcons(dom?: HTMLElement): void {
+  loadIcons(dom?: Element): void {
     for (const icon of this.icons) {
       import(`./svg/${icon}.svg`)
         .then(r => r.default)
