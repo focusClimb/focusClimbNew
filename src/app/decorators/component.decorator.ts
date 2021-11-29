@@ -1,75 +1,94 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { SvgIcons } from '@icons/svg-icons';
 import { OnInit } from '@interfaces/component.interface';
-import { SvgIcons } from '@app/icons/svg-icons';
+import { ComponentArguments } from '@models/component-arguments.mode';
+import { Subject } from '@reactive/subject';
 
 function isOnInit(arg: any): arg is OnInit {
   return typeof arg?.fcOnInit === 'function';
 }
 
-export interface ComponentArguments {
-  selector: string;
-  template?: Promise<any> | any;
-  style?: Promise<any> | any;
-}
-
 type Constructor<T> = new (...args: any[]) => T;
 
 export function Component(args: ComponentArguments) {
+  const subject = new Subject<any>();
+
+  const htmlElementClass = class extends HTMLElement {
+    constructor() {
+      super();
+
+      (async () => {
+        try {
+          this.attachShadow({ mode: 'open' });
+          this.className = `${args.selector} ${this.className}`;
+
+          await this.attachStyle(args.style);
+          await this.attachTemplate(args.template);
+          await this.attachStyle('');
+          this.loadIcons();
+
+          subject.next({
+            shadowRoot: this.shadowRoot,
+            attributes: this.fetchAttributes()
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      })();
+    }
+
+    async attachTemplate(template: Promise<any> | string): Promise<void> {
+      const rootElement = document.createElement('div');
+      rootElement.innerHTML = template instanceof Promise ? (await template).default : template;
+      this.shadowRoot?.appendChild(rootElement);
+    }
+
+    async attachStyle(style: Promise<any> | string): Promise<void> {
+      if (style instanceof Promise) {
+        (await style).default.use({ target: this.shadowRoot });
+      } else {
+        const styleElement = document.createElement('style');
+        styleElement.textContent = style;
+        this.shadowRoot?.appendChild(styleElement);
+      }
+    }
+
+    fetchAttributes(): { [key: string]: string | number | unknown } {
+      const attributes = {};
+
+      for (const attribute of this.attributes) {
+        attributes[attribute.nodeName] = attribute.nodeValue;
+      }
+
+      return attributes;
+    }
+
+    loadIcons(): void {
+      SvgIcons.instance.loadIcons(this.shadowRoot?.children[1]);
+    }
+  }
 
   return function <T extends Constructor<any>>(BaseClass: T) {
     return class extends BaseClass {
-      static readonly selector: string = args.selector;
-
       constructor(..._args: any[]) {
-        super();
+        super(_args);
 
-        (async () => {
-          try {
-            this.attachShadow({ mode: 'open' });
-            this.applyAttributesToClass();
+        const subIndex = subject.subscribe(data => {
+          BaseClass.prototype.shadowRoot = data.shadowRoot;
 
-            this.className = `${args.selector} ${this.className}`;
-
-            await this.attachStyle(args.style);
-            await this.attachTemplate(args.template);
-            await this.attachStyle('');
-            this.loadIcons();
-
-            if (isOnInit(this)) {
-              this.fcOnInit();
-            }
-
-          } catch (error) {
-            console.error(error);
+          for (const key of Object.keys(data.attributes)) {
+            BaseClass.prototype[key] = data.attributes[key];
           }
-        })();
-      }
 
-      async attachTemplate(template: Promise<any> | string): Promise<void> {
-        const rootElement = document.createElement('div');
-        rootElement.innerHTML = template instanceof Promise ? (await template).default : template;
-        this.shadowRoot.appendChild(rootElement);
-      }
+          if (isOnInit(this)) {
+            this.fcOnInit();
+          }
 
-      async attachStyle(style: Promise<any> | string): Promise<void> {
-        if (style instanceof Promise) {
-          (await style).default.use({ target: this.shadowRoot });
-        } else {
-          const styleElement = document.createElement('style');
-          styleElement.textContent = style;
-          this.shadowRoot.appendChild(styleElement);
-        }
-      }
+          subject.unsubscribe(subIndex);
+        });
 
-      applyAttributesToClass(): void {
-        for (const attribute of this.attributes) {
-          this[attribute.nodeName] = attribute.nodeValue;
-        }
-      }
-
-      loadIcons(): void {
-        SvgIcons.instance.loadIcons(this.shadowRoot.children[1]);
+        customElements.define(args.selector, htmlElementClass);
       }
     }
   };

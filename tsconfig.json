@@ -24,6 +24,7 @@
       "@helpers/*": ["./src/app/helpers/*"],
       "@interfaces/*": ["./src/app/interfaces/*"],
       "@icons/*": ["./src/app/icons/*"],
+      "@models/*": ["./src/app/models/*"],
       "@reactive/*": ["./src/app/reactive/*"],
     },
     "rootDir": "./src",
