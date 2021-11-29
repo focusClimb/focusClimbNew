@@ -22,7 +22,8 @@
       "@components/*": ["./src/app/components/*"],
       "@decorators/*": ["./src/app/decorators/*"],
       "@helpers/*": ["./src/app/helpers/*"],
-      "@icons/*": ["./src/icons/*"]
+      "@interfaces/*": ["./src/app/interfaces/*"],
+      "@icons/*": ["./src/icons/*"],
     },
     "rootDir": "./src",
     "skipLibCheck": true,
@@ -30,6 +31,7 @@
     "strict": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
+    "strictPropertyInitialization": false,
     "target": "es6",
     "types": ["node", "jest"]
   },

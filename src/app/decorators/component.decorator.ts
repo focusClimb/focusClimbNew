@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { OnInit } from '@interfaces/component.interface';
 import { SvgIcons } from '@app/icons/svg-icons';
+
+function isOnInit(arg: any): arg is OnInit {
+  return typeof arg?.fcOnInit === 'function';
+}
 
 export interface ComponentArguments {
   selector: string;
@@ -18,36 +23,53 @@ export function Component(args: ComponentArguments) {
 
       constructor(..._args: any[]) {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.className = args.selector;
 
-        let templatePromise: Promise<any>;
+        (async () => {
+          try {
+            this.attachShadow({ mode: 'open' });
+            this.applyAttributesToClass();
 
-        if (args.template instanceof Promise) {
-          templatePromise = args.template;
-        } else {
-          templatePromise = Promise.resolve(args.template)
-        }
+            this.className = `${args.selector} ${this.className}`;
 
-        templatePromise.then(r => {
-          this.shadowRoot.innerHTML = r.default;
+            await this.attachStyle(args.style);
+            await this.attachTemplate(args.template);
+            await this.attachStyle('');
+            this.loadIcons();
 
-          for (const child of this.shadowRoot.children) {
-            SvgIcons.instance.loadIcons(child);
+            if (isOnInit(this)) {
+              this.fcOnInit();
+            }
+
+          } catch (error) {
+            console.error(error);
           }
-
-          this.attachStyle(args.style);
-        });
+        })();
       }
 
-      attachStyle(style: Promise<any> | string): void {
+      async attachTemplate(template: Promise<any> | string): Promise<void> {
+        const rootElement = document.createElement('div');
+        rootElement.innerHTML = template instanceof Promise ? (await template).default : template;
+        this.shadowRoot.appendChild(rootElement);
+      }
+
+      async attachStyle(style: Promise<any> | string): Promise<void> {
         if (style instanceof Promise) {
-          style?.then(r => r.default.use({ target: this.shadowRoot }));
+          (await style).default.use({ target: this.shadowRoot });
         } else {
           const styleElement = document.createElement('style');
           styleElement.textContent = style;
           this.shadowRoot.appendChild(styleElement);
         }
+      }
+
+      applyAttributesToClass(): void {
+        for (const attribute of this.attributes) {
+          this[attribute.nodeName] = attribute.nodeValue;
+        }
+      }
+
+      loadIcons(): void {
+        SvgIcons.instance.loadIcons(this.shadowRoot.children[1]);
       }
     }
   };
