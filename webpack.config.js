@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const config = {
   mode: 'production',
@@ -20,6 +23,11 @@ const config = {
         exclude: /node_modules/,
       },
       {
+        test: /\.html$/,
+        exclude: /node_modules/,
+        use: { loader: 'html-loader' }
+      },
+      {
         test: /\.s[ac]ss$/i,
         include: /src/,
         use: [
@@ -36,7 +44,16 @@ const config = {
           },
           "css-loader",
           "sass-loader",
-          'postcss-loader',
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  ["postcss-preset-env", "autoprefixer"],
+                ],
+              },
+            },
+          },
         ],
       },
       {
@@ -46,10 +63,13 @@ const config = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
+    extensions: ['.tsx', '.ts', '.js', '.json', '.css', '.scss'],
+    plugins: [
+      new TsconfigPathsPlugin({})
+    ]
   },
   output: {
-    filename: 'bundle.[hash].js',
+    filename: 'bundle.[chunkhash].js',
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [

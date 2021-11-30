@@ -1,0 +1,13 @@
+@use "sass:math";
+
+$sp1: 8px;
+$sp1-2: math.div($sp1, 2);
+$sp2: $sp1 * 2;
+$sp3: $sp1 * 3;
+$sp4: $sp1 * 4;
+$sp5: $sp1 * 5;
+$sp6: $sp1 * 6;
+$sp7: $sp1 * 7;
+$sp8: $sp1 * 8;
+$sp9: $sp1 * 9;
+$sp10: $sp1 * 10;
