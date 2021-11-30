@@ -1,7 +1,7 @@
 let instance;
-
 export class SvgIcons {
   protected readonly icons: Set<string> = new Set();
+  protected readonly cache = new Map();
 
   static get instance(): SvgIcons {
     if (!instance) {
@@ -14,24 +14,44 @@ export class SvgIcons {
   registerIcons(icons: string[]): void {
     for (const icon of icons) {
       this.icons.add(icon);
+
+      if (!this.cache.has(icon)) {
+        this.cache.set(icon, { url: import(`./svg/${icon}.svg`) });
+      }
     }
   }
 
-  loadIcons(dom?: Element): void {
-    for (const icon of this.icons) {
-      import(`./svg/${icon}.svg`)
-        .then(r => r.default)
-        .then(iconUrl => {
-          fetch(iconUrl)
-            .then(r => r.text())
-            .then(svg => {
-              const elements = (dom || document).getElementsByClassName(icon);
+  async loadIcons(dom?: Element): Promise<void> {
+    if (!dom) {
+      return;
+    }
 
-              for (const element of elements) {
-                element.innerHTML = svg;
-              }
-            });
+    for (const icon of this.icons) {
+      const elements = dom.getElementsByClassName(icon);
+
+      if (!elements.length) {
+        continue;
+      }
+
+      if (!this.cache.get(icon).svg) {
+        const iconUrl = (await this.cache.get(icon).url).default;
+
+        this.cache.set(icon, {
+          ...this.cache.get(icon),
+          svg: fetch(iconUrl).then(r => r.text())
         });
+      }
+
+      const svg = await this.cache.get(icon).svg;
+
+      this.cache.set(icon, {
+        ...this.cache.get(icon),
+        svg: Promise.resolve(svg)
+      });
+
+      for (const element of elements) {
+        element.innerHTML = svg;
+      }
     }
   }
 }
