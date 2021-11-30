@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash-es';
 export class Subject<T> {
   private readonly subscribers = new Map();
 
@@ -7,13 +8,13 @@ export class Subject<T> {
     return key;
   }
 
-  unsubscribe(key: symbol): void {
-    this.subscribers.delete(key);
+  unsubscribe(key: symbol): boolean {
+    return this.subscribers.delete(key);
   }
 
-  next(data: T) {
+  next(data: T): void {
     for (const subscriber of this.subscribers.values()) {
-      subscriber(data);
+      subscriber(cloneDeep(data));
     }
   }
 }
