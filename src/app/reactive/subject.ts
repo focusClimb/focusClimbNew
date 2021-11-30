@@ -1,20 +1,18 @@
 export class Subject<T> {
-  private readonly subscribers: { (data: T): void; } [];
+  private readonly subscribers = new Map();
 
-  constructor() {
-    this.subscribers = [];
+  subscribe(func: (...args) => void): symbol {
+    const key = Symbol();
+    this.subscribers.set(key, func);
+    return key;
   }
 
-  subscribe(func: (...args) => void): number {
-    return this.subscribers.push(func) - 1;
-  }
-
-  unsubscribe(index: number): void {
-    this.subscribers.splice(index, 1);
+  unsubscribe(key: symbol): void {
+    this.subscribers.delete(key);
   }
 
   next(data: T) {
-    for (const subscriber of this.subscribers ) {
+    for (const subscriber of this.subscribers.values()) {
       subscriber(data);
     }
   }
