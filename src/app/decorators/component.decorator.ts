@@ -12,8 +12,7 @@ function isOnInit(arg: any): arg is OnInit {
 type Constructor<T> = new (...args: any[]) => T;
 
 export function Component(args: ComponentArguments) {
-  const subject = new Subject<any>();
-
+  const htmlElementSubject = new Subject<any>();
   const htmlElementClass = class extends HTMLElement {
     constructor() {
       super();
@@ -28,7 +27,7 @@ export function Component(args: ComponentArguments) {
           await this.attachStyle('');
           this.loadIcons();
 
-          subject.next({
+          htmlElementSubject.next({
             shadowRoot: this.shadowRoot,
             attributes: this.fetchAttributes()
           });
@@ -74,7 +73,7 @@ export function Component(args: ComponentArguments) {
       constructor(..._args: any[]) {
         super(_args);
 
-        const subIndex = subject.subscribe(data => {
+        const htmlELementSub = htmlElementSubject.subscribe(data => {
           BaseClass.prototype.shadowRoot = data.shadowRoot;
 
           for (const key of Object.keys(data.attributes)) {
@@ -85,7 +84,7 @@ export function Component(args: ComponentArguments) {
             this.fcOnInit();
           }
 
-          subject.unsubscribe(subIndex);
+          htmlElementSubject.unsubscribe(htmlELementSub);
         });
 
         customElements.define(args.selector, htmlElementClass);
