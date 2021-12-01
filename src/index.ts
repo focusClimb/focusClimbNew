@@ -14,7 +14,7 @@ import { SvgIconsService } from '@services/svg-icons.service';
     const styles = (await import('./styles.scss')).default;
     styles.use({ target: document.getElementsByTagName('head')[0] });
 
-    new WallpaperComponent<PexelsResponse>(pexelsPhotoSource, new PhotoService<PexelsResponse>());
+    new WallpaperComponent<PexelsResponse>(new PhotoService<PexelsResponse>(pexelsPhotoSource));
     new AppComponent();
   } catch (error) {
     console.error(error);

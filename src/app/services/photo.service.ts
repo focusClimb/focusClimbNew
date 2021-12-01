@@ -7,6 +7,10 @@ export class PhotoService<T> {
   readonly CACHE_KEY = 'fc_photos_service';
   readonly CACHE_TIME_DURATION = 30; // Minutes
 
+  constructor(public photoSource: PhotoSource<T>) {
+
+  }
+
   writeToCache(data: PhotoSourceCache<T>): void {
     localStorage.setItem(this.CACHE_KEY, JSON.stringify(data));
   }
@@ -20,20 +24,20 @@ export class PhotoService<T> {
     localStorage.removeItem(this.CACHE_KEY);
   }
 
-  updateState(photoSource: PhotoSource<T>, response: T): void {
+  updateState(response: T): void {
     this.writeToCache({
-      photoSource,
+      photoSource: this.photoSource,
       response: response,
       date: new Date(),
       state: {}
     });
   }
 
-  async loadPhotos(photoSource: PhotoSource<T>): Promise<PhotoResponse<T>> {
+  async loadPhotos(): Promise<PhotoResponse<T>> {
     const cachedData = this.readFromCache();
 
-    if (cachedData?.photoSource.params.query === photoSource.params.query
-      && cachedData?.photoSource.params.page === photoSource.params.page
+    if (cachedData?.photoSource.params.query === this.photoSource.params.query
+      && cachedData?.photoSource.params.page === this.photoSource.params.page
       && cachedData?.response) {
       const lastUpdateDate = new Date(cachedData.date);
       const now = new Date();
@@ -42,27 +46,27 @@ export class PhotoService<T> {
       if (lastUpdateDuration <= this.CACHE_TIME_DURATION) {
         return {
           originalResponse: cachedData.response,
-          photos: photoSource.extractPhotos(cachedData.response)
+          photos: this.photoSource.extractPhotos(cachedData.response)
         };
       }
     }
 
-    const response = await this.sendRequest(photoSource);
-    this.updateState(photoSource, response);
+    const response = await this.sendRequest();
+    this.updateState(response);
 
     return {
       originalResponse: response,
-      photos: photoSource.extractPhotos(response)
+      photos: this.photoSource.extractPhotos(response)
     };
   }
 
-  async sendRequest(photoSource: PhotoSource<T>): Promise<T> {
-    const queryString = UrlHelper.convertToQueryString(photoSource.params);
-    const request = new Request(`${photoSource.url}?${queryString}`);
+  async sendRequest(): Promise<T> {
+    const queryString = UrlHelper.convertToQueryString(this.photoSource.params);
+    const request = new Request(`${this.photoSource.url}?${queryString}`);
     const headers = new Headers();
 
-    for (const header of Object.keys(photoSource.headers)) {
-      headers.append(header, photoSource.headers[header]);
+    for (const header of Object.keys(this.photoSource.headers)) {
+      headers.append(header, this.photoSource.headers[header]);
     }
 
     const init = {

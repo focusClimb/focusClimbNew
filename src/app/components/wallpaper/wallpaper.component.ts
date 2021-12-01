@@ -1,6 +1,5 @@
 import { Component } from '@decorators/component.decorator';
 import { OnInit } from '@interfaces/component.interface';
-import { PhotoSource } from '@models/photo-source.model';
 import { Photo } from '@models/photo.model';
 import { PhotoService } from '@services/photo.service';
 
@@ -17,10 +16,7 @@ export class WallpaperComponent<T> implements OnInit {
   photographerNameElement: HTMLSpanElement;
   styleElement: HTMLStyleElement;
 
-  constructor(
-    private photoSource: PhotoSource<T>,
-    private photoService: PhotoService<T>
-  ) {
+  constructor(private photoService: PhotoService<T>) {
 
   }
 
@@ -29,9 +25,9 @@ export class WallpaperComponent<T> implements OnInit {
     this.photographerNameElement = this.photographerElement?.getElementsByClassName('fc-wallpaper-photographer-name')[0] as HTMLSpanElement;
     this.styleElement = this.shadowRoot.lastChild as HTMLStyleElement;
 
-    this.photoSource.params.query = this.search;
-    this.photoSource.params.page = 9;
-    this.photoService.loadPhotos(this.photoSource).then(data => {
+    this.photoService.photoSource.params.query = this.search;
+    this.photoService.photoSource.params.page = 9;
+    this.photoService.loadPhotos().then(data => {
       if (!data?.photos?.length) {
         this.photoService.clearCache();
         return;
