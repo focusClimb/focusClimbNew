@@ -71,7 +71,7 @@ export function Component(args: ComponentArguments) {
   return function <T extends Constructor<any>>(BaseClass: T) {
     return class extends BaseClass {
       constructor(..._args: any[]) {
-        super(_args);
+        super(..._args);
 
         const htmlELementSub = htmlElementSubject.subscribe(data => {
           BaseClass.prototype.shadowRoot = data.shadowRoot;
