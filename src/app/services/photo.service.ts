@@ -1,11 +1,10 @@
 import { UrlHelper } from '@helpers/url.helper';
+import { PhotoResponse } from '@models/photo-response.model';
 import { PhotoSourceCache } from '@models/photo-source-cache.model';
 import { PhotoSource } from '@models/photo-source.model';
 
-
-
 export class PhotoService<T> {
-  readonly CACHE_KEY = 'fc_pexels_service';
+  readonly CACHE_KEY = 'fc_photos_service';
   readonly CACHE_TIME_DURATION = 30; // Minutes
 
   writeToCache(data: PhotoSourceCache<T>): void {
@@ -21,16 +20,16 @@ export class PhotoService<T> {
     localStorage.removeItem(this.CACHE_KEY);
   }
 
-  async updateState(photoSource: PhotoSource, response: Promise<T>): Promise<void> {
+  updateState(photoSource: PhotoSource<T>, response: T): void {
     this.writeToCache({
       photoSource,
-      response: await response,
+      response: response,
       date: new Date(),
       state: {}
     });
   }
 
-  async loadPhotos(photoSource: PhotoSource): Promise<T> {
+  async loadPhotos(photoSource: PhotoSource<T>): Promise<PhotoResponse<T>> {
     const cachedData = this.readFromCache();
 
     if (cachedData?.photoSource.params.query === photoSource.params.query
@@ -41,17 +40,23 @@ export class PhotoService<T> {
       const lastUpdateDuration = (now.getTime() - lastUpdateDate.getTime()) / 1000 / 60;
 
       if (lastUpdateDuration <= this.CACHE_TIME_DURATION) {
-        return cachedData.response;
+        return {
+          originalResponse: cachedData.response,
+          photos: photoSource.extractPhotos(cachedData.response)
+        };
       }
     }
 
-    const response = this.sendRequest(photoSource);
+    const response = await this.sendRequest(photoSource);
     this.updateState(photoSource, response);
 
-    return response;
+    return {
+      originalResponse: response,
+      photos: photoSource.extractPhotos(response)
+    };
   }
 
-  async sendRequest(photoSource: PhotoSource): Promise<T> {
+  async sendRequest(photoSource: PhotoSource<T>): Promise<T> {
     const queryString = UrlHelper.convertToQueryString(photoSource.params);
     const request = new Request(`${photoSource.url}?${queryString}`);
     const headers = new Headers();
