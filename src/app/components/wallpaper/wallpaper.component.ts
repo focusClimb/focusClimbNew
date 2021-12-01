@@ -18,7 +18,6 @@ const PEXELS = {
   }
 } as PhotoSource;
 
-
 @Component({
   selector: 'fc-wallpaper',
   template: import('./wallpaper.component.html'),
@@ -27,48 +26,48 @@ const PEXELS = {
 export class WallpaperComponent implements OnInit {
   search: string;
   shadowRoot: ShadowRoot;
+  photographerElement: HTMLAnchorElement;
+  photographerNameElement: HTMLSpanElement;
+  styleElement: HTMLStyleElement;
+
   photoService = new PhotoService<PexelsResponse>()
 
   fcOnInit(): void {
+    this.photographerElement = this.shadowRoot.getElementById('fcWallpaperPhotographer') as HTMLAnchorElement;
+    this.photographerNameElement = this.photographerElement?.getElementsByClassName('fc-wallpaper-photographer-name')[0] as HTMLSpanElement;
+    this.styleElement = this.shadowRoot.lastChild as HTMLStyleElement;
+
     PEXELS.params.query = this.search;
     PEXELS.params.page = 9;
     this.photoService.loadPhotos(PEXELS).then(data => this.updateBackground(data));
   }
 
   updateBackground(data: PexelsResponse): void {
-    if (!this.shadowRoot || !data?.photos?.length) {
+    if (!data?.photos?.length) {
       this.photoService.clearCache();
       return;
     }
 
     const photo = data.photos[((max) => Math.floor(Math.random() * max))(data.photos.length)];
 
-    const photographerElement = this.shadowRoot.getElementById('fcWallpaperPhotographer') as HTMLAnchorElement;
-    const photographerNameElement = photographerElement?.getElementsByClassName('fc-wallpaper-photographer-name')[0] as HTMLSpanElement;
-    const styleElement = this.shadowRoot.lastChild as HTMLStyleElement;
+    this.styleElement.innerHTML = `
+      .fc-wallpaper-photo {
+        background-image: url(${photo.src.original}?auto=compress&cs=tinysrgb&&fit=crop&h=54&w=96);
+      }
 
-    if (styleElement) {
-      styleElement.innerHTML = `
-        .fc-wallpaper-photo {
-          background-image: url(${photo.src.original}?auto=compress&cs=tinysrgb&&fit=crop&h=54&w=96);
-        }
+      .fc-wallpaper-photo::after {
+        background-image: url(${photo.src.original}?fit=crop&h=1080&w=1920);
+        animation: fadeInAnimation 2s forwards ease-in;
+      }
 
-        .fc-wallpaper-photo::after {
-          background-image: url(${photo.src.original}?fit=crop&h=1080&w=1920);
-          animation: fadeInAnimation 2s forwards ease-in;
-        }
+      .fc-wallpaper-photo .fc-wallpaper-photographer {
+        animation: fadeInAnimation 2s forwards ease-in;
+      }
+    `;
 
-        .fc-wallpaper-photo .fc-wallpaper-photographer {
-          animation: fadeInAnimation 2s forwards ease-in;
-        }
-      `;
-    }
-
-    if (photographerElement) {
-      photographerElement.href = photo.photographer_url;
-      photographerNameElement.innerText = photo.photographer;
-      photographerNameElement.title = `Photographer: ${photo.photographer}`;
-    }
+    this.photographerElement.href = photo.photographer_url;
+    this.photographerNameElement.innerText = photo.photographer;
+    this.photographerNameElement.title = `Photographer: ${photo.photographer}`;
   }
 }
 
