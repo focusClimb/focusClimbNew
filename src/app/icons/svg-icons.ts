@@ -11,13 +11,16 @@ export class SvgIcons {
     return instance;
   }
 
-  registerIcons(icons: string[]): void {
-    for (const icon of icons) {
-      this.icons.add(icon);
+  async registerIcons(icons: string[]): Promise<void> {
+    try {
+      for (const icon of icons) {
+        this.icons.add(icon);
 
-      if (!this.cache.has(icon)) {
-        this.cache.set(icon, { url: import(`./svg/${icon}.svg`) });
+        const iconUrl = (await import(`./svg/${icon}.svg`)).default;
+        this.cache.set(icon, fetch(iconUrl).then(r => r.text()));
       }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -26,32 +29,17 @@ export class SvgIcons {
       return;
     }
 
-    for (const icon of this.icons) {
-      const elements = dom.getElementsByClassName(icon);
+    try {
+      for (const icon of this.icons) {
+        const elements = dom.getElementsByClassName(icon);
+        const svg = await this.cache.get(icon);
 
-      if (!elements.length) {
-        continue;
+        for (const element of elements) {
+          element.innerHTML = svg;
+        }
       }
-
-      if (!this.cache.get(icon).svg) {
-        const iconUrl = (await this.cache.get(icon).url).default;
-
-        this.cache.set(icon, {
-          ...this.cache.get(icon),
-          svg: fetch(iconUrl).then(r => r.text())
-        });
-      }
-
-      const svg = await this.cache.get(icon).svg;
-
-      this.cache.set(icon, {
-        ...this.cache.get(icon),
-        svg: Promise.resolve(svg)
-      });
-
-      for (const element of elements) {
-        element.innerHTML = svg;
-      }
+    } catch (error) {
+      console.error(error);
     }
   }
 }

@@ -1,14 +1,18 @@
 import { AppComponent } from '@app/app.component';
 import { WallpaperComponent } from '@components/wallpaper/wallpaper.component';
-import { SvgIcons } from '@app/icons/svg-icons';
+import iconList from '@icons/icon-list';
+import { SvgIcons } from '@icons/svg-icons';
 
-SvgIcons.instance.registerIcons([
-  'icon-camera'
-]);
+(async () => {
+  try {
+    await SvgIcons.instance.registerIcons(iconList);
 
-import('./styles.scss').then(r => r.default.use({ target: document.getElementsByTagName('head')[0] }));
+    const styles = (await import('./styles.scss')).default;
+    styles.use({ target: document.getElementsByTagName('head')[0] });
 
-new AppComponent();
-new WallpaperComponent();
-
-
+    new WallpaperComponent();
+    new AppComponent();
+  } catch (error) {
+    console.error(error);
+  }
+})();
