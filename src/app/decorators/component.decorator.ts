@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { SvgIcons } from '@icons/svg-icons';
 import { OnInit } from '@interfaces/component.interface';
 import { ComponentArguments } from '@models/component-arguments.mode';
 import { Subject } from '@reactive/subject';
+import { SvgIconsService } from '@services/svg-icons.service';
 
 function isOnInit(arg: any): arg is OnInit {
   return typeof arg?.fcOnInit === 'function';
@@ -64,7 +64,7 @@ export function Component(args: ComponentArguments) {
     }
 
     loadIcons(): void {
-      SvgIcons.instance.loadIcons(this.shadowRoot?.children[1]);
+      SvgIconsService.instance.loadIcons(this.shadowRoot?.children[1]);
     }
   }
 

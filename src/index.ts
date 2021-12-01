@@ -1,11 +1,11 @@
 import { AppComponent } from '@app/app.component';
+import { icons } from '@app/icons';
 import { WallpaperComponent } from '@components/wallpaper/wallpaper.component';
-import iconList from '@icons/icon-list';
-import { SvgIcons } from '@icons/svg-icons';
+import { SvgIconsService } from '@services/svg-icons.service';
 
 (async () => {
   try {
-    await SvgIcons.instance.registerIcons(iconList);
+    await SvgIconsService.instance.registerIcons(icons);
 
     const styles = (await import('./styles.scss')).default;
     styles.use({ target: document.getElementsByTagName('head')[0] });
